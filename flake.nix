@@ -39,15 +39,24 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    wallpapers = {
+      url = "git+https://github.com/OulipianSummer/nixos-pattern-nord-wallpapers";
+      flake = false;
+    };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, binaryninja, home-manager, zen-browser, burpsuitepro, hyprland, spicetify, ... }@inputs: {
+  outputs = { self, nixpkgs, binaryninja, home-manager, zen-browser, burpsuitepro, hyprland, spicetify, wallpapers, stylix, ... }@inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
         # Import the previous configuration.nix we used,
         # so the old configuration file still takes effect
+        #stylix.nixosModules.stylix
         ./configuration.nix
         binaryninja.nixosModules.binaryninja
         home-manager.nixosModules.home-manager

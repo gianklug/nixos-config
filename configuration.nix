@@ -13,9 +13,13 @@
     ];
 
   # Flaaaakes
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "giank" ];
+  };
 
 
+  #inputs.stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
 
   # boot settings
   boot = {
@@ -80,6 +84,7 @@
   networking.networkmanager.enable = true;
   networking.extraHosts = ''
       192.168.178.2 netbird.manabar.ch
+      10.202.200.1 sso.int.tux42.local
     '';
 
   services.tlp = {
@@ -104,6 +109,7 @@
     };
   };
   services.fwupd.enable = true;
+  services.blueman.enable = true;
 
   services.netbird.enable = true;
 
@@ -136,6 +142,13 @@
   };
 
   # Hyprland
+  programs.hyprland = {
+    enable = true;
+    # set the flake package
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    # make sure to also set the portal package, so that they are in sync
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  };
   #programs.hyprland = {
 	#	enable = true;
 	#	xwayland.enable = true;
@@ -234,6 +247,7 @@
     spotify
     spicetify-cli
     telegram-desktop
+    mixxx
     # CLI Tools
     vim 
     wget
@@ -255,7 +269,7 @@
     nodejs_24
     bun
     # CTF
-    (python312.withPackages (ps: with ps; [ pwntools ipython pycryptodome pip opencv4 pillow numpy scipy matplotlib fpylll cysignals pipx mkdocs mkdocs-material ]))
+    (python312.withPackages (ps: with ps; [ pwntools ipython pycryptodome pip opencv4 pillow numpy scipy matplotlib fpylll cysignals pipx]))
     avalonia-ilspy
     apktool
     binwalk
@@ -285,6 +299,7 @@
     qemu
     remmina
     gnome-network-displays
+    kdePackages.kdenlive
     # Manabar
     netbird
     # Gstreamer

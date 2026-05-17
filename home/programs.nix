@@ -1,6 +1,8 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
+
+
   # Hyfetch configuration
   programs.hyfetch = {
     enable = true;

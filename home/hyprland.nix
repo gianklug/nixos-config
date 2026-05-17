@@ -4,13 +4,14 @@
   # HYPA HYPA LAND
   wayland.windowManager.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    package = null;
+    portalPackage = null;
 
 
     settings = {
       "$mod" = "SUPER";
       general = {
+        allow_tearing = true;
         "col.active_border"="rgb(5bcefa) rgb(f5a9b8) rgb(ffffff) rgb(5bcefa) rgb(f5a9b8) 45deg";
         resize_on_border = true;
         snap = {
@@ -92,6 +93,9 @@
         "float,class:(clipse)"
         "size 622 652,class:(clipse)"
       ];
+      windowrule = [
+        "immediate,title:^(Celeste)$"
+      ];
       input = {"kb_layout" = "ch";};
       dwindle = {"smart_split" = true;};
     };
@@ -130,5 +134,16 @@
         }
       ];
     };
+  };
+
+  services.hyprpaper = {
+    enable = true;
+    settings = {
+      preload = "${inputs.wallpapers}/jpgs/nix-d-nord-aurora.jpg";
+      wallpaper = [
+        ",${inputs.wallpapers}/jpgs/nix-d-nord-aurora.jpg"
+      ];
+    };
+
   };
 }
