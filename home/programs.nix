@@ -58,9 +58,10 @@
   #'';
   programs.git = {
     enable = true;
-    userName  = "Gian Klug";
-    userEmail = "gian.klug@ict-scouts.ch";
+    settings = {
+      user.name = "Gian Klug";
+      user.email = "gian.klug@ict-scouts.ch";
+    };
   };
 }
-
 

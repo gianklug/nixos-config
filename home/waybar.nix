@@ -7,7 +7,7 @@
       mainBar = {
         layer = "top";
         position = "top";
-        height = 20;
+        height = 16;
         modules-left = [ "hyprland/workspaces"];
         modules-center = ["hyprland/window"];
         modules-right = [
@@ -134,7 +134,7 @@
     
     * {
       font-family: FantasqueSansMono Nerd Font;
-      font-size: 15px;
+      font-size: 13px;
       min-height: 0;
     }
 
@@ -150,7 +150,7 @@
     #waybar {
       background: transparent;
       color: @text;
-      margin: 5px 5px;
+      margin: 0px;
     }
     
     #workspaces {

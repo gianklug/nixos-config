@@ -7,8 +7,8 @@
   };
 
   inputs = {
-    # NixOS official package source, using the nixos-25.05 branch here
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    # NixOS official package source
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     pwndbg.url = "github:pwndbg/pwndbg";
     binaryninja = {
       url = "github:jchv/nix-binary-ninja";
@@ -21,7 +21,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-26.05";
       # The `follows` keyword in inputs is used for inheritance.
       # Here, `inputs.nixpkgs` of home-manager is kept consistent with
       # the `inputs.nixpkgs` of the current flake,
@@ -47,26 +47,45 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
-
-  outputs = { self, nixpkgs, binaryninja, home-manager, zen-browser, burpsuitepro, hyprland, spicetify, wallpapers, stylix, ... }@inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
-      modules = [
-        # Import the previous configuration.nix we used,
-        # so the old configuration file still takes effect
-        #stylix.nixosModules.stylix
-        ./configuration.nix
-        binaryninja.nixosModules.binaryninja
-        home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.giank = import ./home-manager.nix;
-            home-manager.extraSpecialArgs = { inherit inputs; };
-        }
-      ];
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  outputs = { self, nixpkgs, binaryninja, home-manager, disko, ... }@inputs:
+    let
+      system = "x86_64-linux";
+      commonModules = [
+        ./configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.giank = import ./home-manager.nix;
+          home-manager.extraSpecialArgs = { inherit inputs; };
+        }
+      ];
+      mkHost = extraModules: nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = commonModules ++ extraModules;
+      };
+    in {
+      nixosConfigurations = {
+        nixos = mkHost [
+          binaryninja.nixosModules.binaryninja
+          ./hosts/nixos/default.nix
+          ./hardware-configuration.nix
+          { networking.hostName = "nixos"; }
+        ];
+
+        travel = mkHost [
+          disko.nixosModules.disko
+          ./hosts/travel/default.nix
+          ./hosts/travel/disko.nix
+          ./hosts/travel/hardware-configuration.nix
+        ];
+      };
+    };
 }

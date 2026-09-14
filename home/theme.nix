@@ -4,6 +4,8 @@
   # Enable GTK theme settings
   gtk = {
     enable = true;
+    # Preserve the pre-26.05 GTK4 theme default.
+    gtk4.theme = config.gtk.theme;
     theme = {
       name = "Adwaita-dark";
       package = pkgs.gnome-themes-extra;

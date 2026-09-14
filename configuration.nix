@@ -7,7 +7,6 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
       inputs.spicetify.nixosModules.spicetify
       #./home-manager.nix
     ];
@@ -134,13 +133,6 @@
 	#	wayland.enable = true;
   #};
 
-  # Binja flake
-  # $ nix-store --add-fixed sha256 <path-to-installer>.zip
-  programs.binary-ninja = {
-    enable = true;
-    package = pkgs.binary-ninja-personal-wayland;
-  };
-
   # Hyprland
   programs.hyprland = {
     enable = true;
@@ -166,7 +158,7 @@
 
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.gdm.enable = true;
   #services.xserver.desktopManager.gnome.enable = true;
 
   # Thunderbolt
@@ -228,7 +220,14 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs;
+    let
+      # Keep the interpreter/runtime but avoid the currently broken CPython
+      # documentation output in nixpkgs 26.05.
+      python313NoDocs = python313.overrideAttrs (_: {
+        outputs = [ "out" "dev" ];
+      });
+    in [
     # GUI
     discord
     wofi
@@ -241,8 +240,8 @@
     grimblast
     gimp
     inkscape
-    inputs.zen-browser.packages."${system}".default
-    inputs.burpsuitepro.packages.${system}.default
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    inputs.burpsuitepro.packages.${pkgs.stdenv.hostPlatform.system}.default
     threema-desktop
     spotify
     spicetify-cli
@@ -269,7 +268,16 @@
     nodejs_24
     bun
     # CTF
-    (python312.withPackages (ps: with ps; [ pwntools ipython pycryptodome pip opencv4 pillow numpy scipy matplotlib fpylll cysignals pipx]))
+    (python313NoDocs.withPackages (ps: with ps; [
+      pwntools ipython pycryptodome pip opencv4 pillow numpy scipy matplotlib
+      fpylll cysignals (pipx.overrideAttrs (old: {
+        # pipx 1.8.0's package-specifier tests currently fail on 26.05
+        # due to whitespace expectations; runtime behavior is unaffected.
+        disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+          "tests/test_package_specifier.py"
+        ];
+      }))
+    ]))
     avalonia-ilspy
     apktool
     binwalk
@@ -295,7 +303,6 @@
     # TF
     infracost
     opentofu
-    packer
     qemu
     remmina
     gnome-network-displays
