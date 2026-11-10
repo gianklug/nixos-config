@@ -35,6 +35,9 @@
     extraPackages = with pkgs; [ intel-media-driver ];
   };
 
+  # Work around Aquamarine's atomic modeset failure during GDM's DRM handoff.
+  environment.sessionVariables.AQ_NO_ATOMIC = "1";
+
   # Start Hyprland from GDM on the local seat, not from an SSH/TTY session.
   services.displayManager.defaultSession = "hyprland";
 
