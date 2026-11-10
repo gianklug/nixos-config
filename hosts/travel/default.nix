@@ -1,7 +1,31 @@
-{ pkgs, ... }:
+{
+  inputs,
+  nixosModules,
+  pkgs,
+  ...
+}:
 
 {
+  imports = [
+    nixosModules.desktop
+    nixosModules.development
+    nixosModules.laptop
+    nixosModules.personal
+    nixosModules.security
+    nixosModules.services
+    nixosModules.user
+    nixosModules.virtualization
+    inputs.disko.nixosModules.disko
+    ./disko.nix
+    ./hardware-configuration.nix
+  ];
+
   networking.hostName = "travel";
+
+  local.primaryUser = {
+    name = "giank";
+    hashedPassword = "$y$j9T$ZUrmQWtp8n5qnzWE1IvfH1$6945HI7ShjquZk7x.D2N2Q8k1PitEcV8rdBPR3mrAQ0";
+  };
 
   # Intel UHD graphics (PCI device 8086:3ea0) on the local seat.
   boot.kernelModules = [ "i915" ];

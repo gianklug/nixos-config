@@ -1,15 +1,15 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   # Zoxide configuration
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
-    options = ["--cmd z"];
+    options = [ "--cmd z" ];
   };
 
   # Enable zsh
-  programs.zsh = { 
+  programs.zsh = {
     enable = true;
 
     # Fix nix-shell
@@ -25,7 +25,7 @@
         };
       }
     ];
-    
+
     # Cool external plugins
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
@@ -34,24 +34,39 @@
     oh-my-zsh = {
       enable = true;
       plugins = [
-        "aliases" "ansible" "branch" "common-aliases" 
-        "docker" "docker-compose" "fzf" "git" "gitignore" 
-        "history-substring-search" "helm" "kubectl" "pip" 
-        "poetry" "pylint" "ssh-agent" "systemd" "urltools"
+        "aliases"
+        "ansible"
+        "branch"
+        "common-aliases"
+        "docker"
+        "docker-compose"
+        "fzf"
+        "git"
+        "gitignore"
+        "history-substring-search"
+        "helm"
+        "kubectl"
+        "pip"
+        "poetry"
+        "pylint"
+        "ssh-agent"
+        "systemd"
+        "urltools"
       ];
       theme = "agnoster";
     };
     # Startup scripts
     initContent = "pfetch";
-    
+
     # Aliases
     shellAliases = {
       cat = "bat";
       k = "kubectl";
       cd = "z";
-      cleanup="sudo nix-collect-garbage";
-      switch="nixos-rebuild switch --flake . --show-trace --print-build-logs --use-remote-sudo";
-      config="cd /home/giank/git/nixos-config";
+      vim = "nvim";
+      cleanup = "sudo nix-collect-garbage";
+      switch = "nixos-rebuild switch --flake . --show-trace --print-build-logs --use-remote-sudo";
+      config = "cd ${config.home.homeDirectory}/git/nixos-config";
     };
   };
 }

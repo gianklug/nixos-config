@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }:
+{ inputs, ... }:
 {
   wayland.windowManager.hyprland = {
     enable = true;
@@ -31,6 +31,9 @@
       })
 
       hl.config({
+        binds = {
+          drag_threshold = 10,
+        },
         general = {
           allow_tearing = true,
           resize_on_border = true,
@@ -131,19 +134,19 @@
       bind(
         "SUPER + mouse:272",
         hl.dsp.window.drag(),
-        { drag = true }
+        { mouse = true }
       )
 
       bind(
         "SUPER + mouse:273",
         hl.dsp.window.resize(),
-        { drag = true }
+        { mouse = true }
       )
 
       bind(
         "SUPER + ALT + mouse:272",
         hl.dsp.window.resize(),
-        { drag = true }
+        { mouse = true }
       )
 
       hl.gesture({
@@ -253,41 +256,41 @@
       })      
     '';
   };
-    # Hyprlock
-    programs.hyprlock = {
-      enable = true;
-      settings = {
-        general = {
-          disable_loading_bar = false;
-          grace = 1;
-          hide_cursor = true;
-          no_fade_in = false;
-        };
-
-        background = [
-          {
-            path = "screenshot";
-            blur_passes = 3;
-            blur_size = 8;
-          }
-        ];
-
-        input-field = [
-          {
-            size = "200, 50";
-            position = "0, -80";
-            monitor = "";
-            dots_center = true;
-            fade_on_empty = false;
-            font_color = "rgb(202, 211, 245)";
-            inner_color = "rgb(91, 96, 120)";
-            outer_color = "rgb(24, 25, 38)";
-            outline_thickness = 5;
-            shadow_passes = 2;
-          }
-        ];
+  # Hyprlock
+  programs.hyprlock = {
+    enable = true;
+    settings = {
+      general = {
+        disable_loading_bar = false;
+        grace = 1;
+        hide_cursor = true;
+        no_fade_in = false;
       };
+
+      background = [
+        {
+          path = "screenshot";
+          blur_passes = 3;
+          blur_size = 8;
+        }
+      ];
+
+      input-field = [
+        {
+          size = "200, 50";
+          position = "0, -80";
+          monitor = "";
+          dots_center = true;
+          fade_on_empty = false;
+          font_color = "rgb(202, 211, 245)";
+          inner_color = "rgb(91, 96, 120)";
+          outer_color = "rgb(24, 25, 38)";
+          outline_thickness = 5;
+          shadow_passes = 2;
+        }
+      ];
     };
+  };
 
   services.hyprpaper = {
     enable = true;

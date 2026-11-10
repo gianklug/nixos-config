@@ -1,35 +1,35 @@
 {
   description = "System configuration";
   nixConfig = {
-    extra-substituters = ["https://hyprland.cachix.org"];
-    extra-trusted-substituters = ["https://hyprland.cachix.org"];
-    extra-trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+    extra-substituters = [ "https://hyprland.cachix.org" ];
+    extra-trusted-substituters = [ "https://hyprland.cachix.org" ];
+    extra-trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+    ];
   };
 
   inputs = {
-    # NixOS official package source
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    pwndbg.url = "github:pwndbg/pwndbg";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     binaryninja = {
       url = "github:jchv/nix-binary-ninja";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix4nvchad = {
+      url = "github:nix-community/nix4nvchad";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
-      # IMPORTANT: we're using "libgbm" and is only available in unstable so ensure
-      # to have it up-to-date or simply don't specify the nixpkgs input
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
-      # The `follows` keyword in inputs is used for inheritance.
-      # Here, `inputs.nixpkgs` of home-manager is kept consistent with
-      # the `inputs.nixpkgs` of the current flake,
-      # to avoid problems caused by different versions of nixpkgs.
       inputs.nixpkgs.follows = "nixpkgs";
     };
     burpsuitepro = {
-      url = "github:xiv3r/Burpsuite-Professional/9689f4ab41bddc9f7bce0f95ecf68e2c2a1e065d";
+      url = "git+ssh://git@github.com/gianklug/nix-flake-burpsuitepro.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland = {
@@ -43,49 +43,15 @@
       url = "git+https://github.com/OulipianSummer/nixos-pattern-nord-wallpapers";
       flake = false;
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, binaryninja, home-manager, disko, ... }@inputs:
-    let
-      system = "x86_64-linux";
-      commonModules = [
-        ./configuration.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.giank = import ./home-manager.nix;
-          home-manager.extraSpecialArgs = { inherit inputs; };
-        }
-      ];
-      mkHost = extraModules: nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit inputs; };
-        modules = commonModules ++ extraModules;
-      };
-    in {
-      nixosConfigurations = {
-        nixos = mkHost [
-          binaryninja.nixosModules.binaryninja
-          ./hosts/nixos/default.nix
-          ./hardware-configuration.nix
-          { networking.hostName = "nixos"; }
-        ];
-
-        travel = mkHost [
-          disko.nixosModules.disko
-          ./hosts/travel/default.nix
-          ./hosts/travel/disko.nix
-          ./hosts/travel/hardware-configuration.nix
-        ];
-      };
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ ./flake-module.nix ];
     };
 }
