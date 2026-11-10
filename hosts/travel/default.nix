@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   nixosModules,
   pkgs,
   ...
@@ -35,11 +36,16 @@
     extraPackages = with pkgs; [ intel-media-driver ];
   };
 
-  # Work around Aquamarine's atomic modeset failure during GDM's DRM handoff.
-  environment.sessionVariables.AQ_NO_ATOMIC = "1";
-
-  # Start Hyprland from GDM on the local seat, not from an SSH/TTY session.
-  services.displayManager.defaultSession = "hyprland";
+  # Use a TTY greeter to avoid GDM's DRM handoff triggering Aquamarine's
+  # atomic modeset bug on the Intel GPU and DP-MST dock.
+  services.displayManager.gdm.enable = lib.mkForce false;
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --cmd start-hyprland";
+      user = "greeter";
+    };
+  };
 
   # Required for reconnecting after nixos-anywhere reboots the machine.
   services.openssh.enable = true;

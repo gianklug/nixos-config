@@ -1,2 +1,2 @@
-#!/bin/bash
-nixos-rebuild switch --flake .#travel --show-trace --print-build-logs --sudo
+#!/usr/bin/env bash
+nixos-rebuild switch --flake .#`hostname` --show-trace --print-build-logs --sudo

@@ -3,7 +3,7 @@
 {
   programs.waybar = {
     enable = true;
-    package = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.waybar;
+    package = pkgs.waybar;
     settings = {
       mainBar = {
         layer = "top";
